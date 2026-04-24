@@ -144,7 +144,7 @@ MIT License - voir [LICENSE](LICENSE)
 
 **Ton Nom**
 - GitHub: [@ruben-ctm](https://github.com/ruben-ctm)
-- LinkedIn: [RubenCombe-Tamain]([https://linkedin.com/in/ton-profil](https://www.linkedin.com/in/rubencombe-tamain/))
+- LinkedIn: [Ruben Combe-Tamain](https://www.linkedin.com/in/rubencombe-tamain/)
 
 ---
 
