@@ -143,8 +143,8 @@ MIT License - voir [LICENSE](LICENSE)
 ## 👤 Auteur
 
 **Ton Nom**
-- GitHub: [@tonusername](https://github.com/tonusername)
-- LinkedIn: [ton-profil](https://linkedin.com/in/ton-profil)
+- GitHub: [@ruben-ctm](https://github.com/ruben-ctm)
+- LinkedIn: [Ruben Combe-Tamain]([https://linkedin.com/in/ton-profil](https://www.linkedin.com/in/rubencombe-tamain/))
 
 ---
 
