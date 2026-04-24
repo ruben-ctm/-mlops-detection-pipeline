@@ -1,0 +1,93 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov
+    
+    - name: Run tests
+      run: |
+        pytest tests/ -v --cov=api --cov-report=xml
+    
+    - name: Upload coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        fail_ci_if_error: false
+
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install linters
+      run: |
+        pip install black flake8 mypy
+    
+    - name: Run Black
+      run: black --check api/ models/ tests/
+    
+    - name: Run Flake8
+      run: flake8 api/ models/ tests/ --max-line-length=100
+    
+    - name: Run MyPy
+      run: mypy api/ --ignore-missing-imports
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: [test, lint]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Login to DockerHub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    
+    - name: Build and push
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/cv-ml-api:latest
+        cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/cv-ml-api:buildcache
+        cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/cv-ml-api:buildcache,mode=max
